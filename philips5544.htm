@@ -7,13 +7,15 @@
     <canvas id="monoscopio" width="1547">
     </canvas>
     <script>
-      const t = 1;
+      //const meH = height/2;
+      //const meW = width/2;
       var c = document.getElementById ("monoscopio");
       var ct = c.getContext ("2d");
       const width = c.width;
       c.height = 13/17 * width;
       const height = c.height;
       const linew = 1;
+
 
       const R = height/13;
       const C = width/17;
@@ -51,23 +53,50 @@
 
       /* Barre laterali */
 
-      ct.fillStyle = "#ff0000";
+      ct.fillStyle = "#507ae9";
       ct.fillRect (2*C,R,C, 2*R);
-      ct.fillStyle = "#00ff00";
+      ct.fillStyle = "#a47a0c";
       ct.fillRect (2*C,10*R,C, 2*R);
-      ct.fillStyle = "#0000ff";
+      ct.fillStyle = "#369D7A";
       ct.fillRect (C,R,C, R*5.5);
-      ct.fillStyle = "#ffffff";
+      ct.fillStyle = "#be587a";
       ct.fillRect (C,6.5*R,C, 5.5*R );
 //
-      ct.fillStyle = "#00ffff";
+      ct.fillStyle = "#507ae9";
       ct.fillRect (C*14,R,C, 2*R);
-      ct.fillStyle = "#aaff00";
+      ct.fillStyle = "#a47a0c";
       ct.fillRect (C*14,10*R,C, 2*R);
-      ct.fillStyle = "#0bb0ff";
+      ct.fillStyle = "#7a9201";
       ct.fillRect (C*15,R,R, R*5.5);
-      ct.fillStyle = "#800010";
+      ct.fillStyle = "#7a63f3";
       ct.fillRect (C*15,6.5*R,C, 5.5*R);
+
+      ct.beginPath ();
+      ct.moveTo (C, R);
+      ct.lineTo (3*C, R);
+      ct.lineTo (3*C, 3*R);
+      ct.lineTo (2*C, 3*R);
+      ct.lineTo (2*C, 10*R);
+      ct.lineTo (3*C, 10*R);
+      ct.lineTo (3*C, 12*R);
+      ct.lineTo (C, 12*R);
+      ct.lineTo (C, R);
+      ct.stroke ();
+
+      ct.strokeStyle = "#ffffff";
+      ct.beginPath ();
+      
+      ct.moveTo (16*C, R);
+      ct.lineTo (14*C, R);
+      ct.lineTo (14*C, 3*R);
+      ct.lineTo (15*C, 3*R);
+      ct.lineTo (15*C, 10*R);
+      ct.lineTo (14*C, 10*R);
+      ct.lineTo (14*C, 12*R);
+      ct.lineTo (16*C, 12*R);
+      ct.lineTo (16*C, R);
+      ct.stroke ();
+
 
       ct.beginPath ();
       ct.arc ((width/2), (height/2), width*6/17, 0, 2 * Math.PI);
@@ -191,7 +220,7 @@
 	ct.lineTo (C*(3+1*i),7*R);
 	ct.stroke ();
       }
-
+      c.width = 2;
     </script>
   </body>
 </html>
