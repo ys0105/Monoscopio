@@ -1,0 +1,197 @@
+<html>
+  <head>
+    <title> MONOSCOPIO </title>
+    <meta charset='utf-8'>
+  </head>
+  <body>
+    <canvas id="monoscopio" width="1547">
+    </canvas>
+    <script>
+      const t = 1;
+      var c = document.getElementById ("monoscopio");
+      var ct = c.getContext ("2d");
+      const width = c.width;
+      c.height = 13/17 * width;
+      const height = c.height;
+      const linew = 1;
+
+      const R = height/13;
+      const C = width/17;
+      ct.lineWidth = 5;
+      function rgbToHex(r, g, b)
+      {
+	return "#"+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);
+      }
+      ct.fillStyle = "#808080";
+      ct.fillRect (0,0,width, height);
+
+
+
+
+
+
+
+
+      ct.strokeStyle = "#ffffff";
+
+      for (var i =0; i < 14;++i)
+      {
+	ct.beginPath ();
+	ct.moveTo (0, R*i);
+        ct.lineTo (width,C*i);
+	ct.stroke ();
+      }
+      for (var j =0; j < 18;++j)
+      {
+	ct.beginPath ();
+	ct.moveTo (R*j, 0);
+        ct.lineTo (R*j, height);
+	ct.stroke ();
+      }
+
+      /* Barre laterali */
+
+      ct.fillStyle = "#ff0000";
+      ct.fillRect (2*C,R,C, 2*R);
+      ct.fillStyle = "#00ff00";
+      ct.fillRect (2*C,10*R,C, 2*R);
+      ct.fillStyle = "#0000ff";
+      ct.fillRect (C,R,C, R*5.5);
+      ct.fillStyle = "#ffffff";
+      ct.fillRect (C,6.5*R,C, 5.5*R );
+//
+      ct.fillStyle = "#00ffff";
+      ct.fillRect (C*14,R,C, 2*R);
+      ct.fillStyle = "#aaff00";
+      ct.fillRect (C*14,10*R,C, 2*R);
+      ct.fillStyle = "#0bb0ff";
+      ct.fillRect (C*15,R,R, R*5.5);
+      ct.fillStyle = "#800010";
+      ct.fillRect (C*15,6.5*R,C, 5.5*R);
+
+      ct.beginPath ();
+      ct.arc ((width/2), (height/2), width*6/17, 0, 2 * Math.PI);
+      ct.fillStyle = "#ffffff";
+      ct.fill ();
+
+      ct.moveTo ((width/2), (height/2));
+      ct.arc ((width/2), (height/2), width*6/17, 0, 2 * Math.PI);
+      ct.clip ();
+
+      ct.fillStyle = "#000000";
+      ct.fillRect (C*6.5,R,C*4, R);
+      ct.strokeStyle = "#ff00ff";
+
+      ct.fillStyle = "#000000";
+      ct.fillRect (C*5.5,R*10,C*6, R);
+      ct.strokeStyle = "#ff00ff";
+
+      /* Colori primari */
+      var colori = ['#bfbf00', '#00bfbf', '#00bf00', '#bf00bf', '#bf0000', '#0000bf'];
+      for (var i =0; i < 6; ++i)
+      {
+	ct.fillStyle = colori[i];
+	ct.fillRect (C*(2.5+2*i),R*4,C*2, R*2);
+      }
+      
+
+      /* Onda quadra */
+      var quadl = R/1.45;
+      var bas = 2.5*C;
+      var i = 0;
+      while (bas < 14.5*C)
+      {
+	ct.fillStyle = (i%2==0) ? "#000000" : "#aaaaaa";
+	ct.fillRect (bas, R*3, quadl, R);
+	bas += quadl;
+	++i;
+      }
+
+
+      /* Timing y/c */
+      ct.fillStyle = "#bfbf00";
+      ct.fillRect (C*2.5, R*11, C*5.5, R*2);
+      ct.fillRect (C*9, R*11, C*5.5, R*2);
+      ct.fillStyle = "#bf0000";
+      ct.fillRect (C*8, R*11, C, R*2);
+
+      ct.fillStyle = "#000000";
+      ct.fillRect (C*3.5, R*2, C*2, R);
+      ct.fillRect (C*11.5, R*2, C*2, R);
+
+      /* Sinusoidi */
+      ct.fillStyle = "#000000";
+      ct.fillRect (C*2.5, R*7, C, R*2);
+      ct.fillRect (C*13.5, R*7, C, R*2);
+      var grad = ct.createLinearGradient (0,0,1,0);
+      var spec = ct.createLinearGradient (0,0,170,0);
+      grad.addColorStop (0, "black");
+      grad.addColorStop (1, "white");
+      spec.addColorStop (0, "white");
+      spec.addColorStop (1, "black");
+
+      ct.fillStyle = grad;
+      ct.fillRect (C*5.5, R*7, C, R*2);
+
+      /* Scala di grigi */
+      var c = 0;
+      for (var i =0; i < 6; ++i)
+      {
+	/* 100:255=p:x */
+	c = Math.floor (255*(i*20)/100);
+	ct.fillStyle = rgbToHex (c,c,c);
+	console.log ("#" + rgbToHex (c,c,c));
+	ct.fillRect (C*(2.5+2*i),R*9,C*2, R);
+      }
+
+      /* Centrale */
+      ct.fillStyle = "#000000";
+      ct.fillRect (C*2.5, R*6, C*12, R);
+      ct.fillRect (C*8, R*5, C, R);
+      ct.fillRect (C*8, R*7, C, R);
+
+      ct.beginPath ();
+      ct.strokeStyle = "#ffffff";
+      ct.moveTo (2.5*C, R*6.5);
+      ct.lineTo (C*14.5, R*6.5);
+      ct.stroke ();
+      ct.beginPath ();
+      ct.moveTo (8.5*C, R*5);
+      ct.lineTo (8.5*C, R*8);
+      ct.stroke ();
+
+
+      /* -- SPILLI -- */
+
+      ct.beginPath ();
+      ct.strokeStyle = "#ffffff";
+      ct.moveTo (6*C, R*10);
+      ct.lineTo (6*C, R*11);
+      ct.stroke ();
+      ct.beginPath ();
+      ct.strokeStyle = "#000000";
+      ct.moveTo (6*C, R*2);
+      ct.lineTo (6*C, R*3);
+      ct.stroke ();
+  
+      /* -- GRIGLIA CENTRALE -- */
+      ct.strokeStyle = "#ffffff";
+      for (var i =0; i < 6; ++i)
+      {
+	ct.beginPath ();
+	ct.moveTo (C*(3+1*i),6*R);
+	ct.lineTo (C*(3+1*i),7*R);
+	ct.stroke ();
+      }
+      for (var i =6; i < 12; ++i)
+      {
+	ct.beginPath ();
+	ct.beginPath ();
+	ct.moveTo (C*(3+1*i),6*R);
+	ct.lineTo (C*(3+1*i),7*R);
+	ct.stroke ();
+      }
+
+    </script>
+  </body>
+</html>
