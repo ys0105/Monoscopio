@@ -4,7 +4,7 @@
     <meta charset='utf-8'>
   </head>
   <body>
-    <canvas id="monoscopio" width="1326" >
+    <canvas id="monoscopio" width="1215.5" >
     </canvas>
     <script>
       function rgbToHex(r, g, b)
@@ -160,15 +160,28 @@
       ct.fillStyle = "#000000";
       ct.fillRect (C*2.5, R*7, C, R*2);
       ct.fillRect (C*13.5, R*7, C, R*2);
-      var grad = ct.createLinearGradient (0,0,1,0);
-      var spec = ct.createLinearGradient (0,0,170,0);
-      grad.addColorStop (0, "black");
-      grad.addColorStop (1, "white");
-      spec.addColorStop (0, "white");
-      spec.addColorStop (1, "black");
+      var grad;
+      var w;
+      var bas;
+      var dt = [5,10,15,25,30];
+      for (var i=0; i < 5;++i)
+      {
+	for (var j = 0; j < dt[i]; ++j)
+        {
+	w = (2*C)/dt[i];
+	bas = (3.5*C) + 2*C*i;
+	grad = ct.createLinearGradient (bas + w *j, 0, bas + w *j + w, 0);
+	grad.addColorStop (0, "black");
+	grad.addColorStop (.2, "gray");
+	grad.addColorStop (.5, "white");
+	grad.addColorStop (.8, "gray");
+	grad.addColorStop (1, "black");
+	ct.fillStyle = grad;
+	console.log (ct.fillStyle);
+	ct.fillRect (bas + w *j, 7*R, w, 2*R);
+	}
+      }
 
-      ct.fillStyle = grad;
-      ct.fillRect (C*5.5, R*7, C, R*2);
 
       /* Scala di grigi */
       var c = 0;
@@ -176,7 +189,7 @@
       {
 	c = Math.floor (255*(i*20)/100);
 	ct.fillStyle = rgbToHex (c,c,c);
-	console.log ("#" + rgbToHex (c,c,c));
+	//console.log ("#" + rgbToHex (c,c,c));
 	ct.fillRect (C*(2.5+2*i),R*9,C*2, R);
       }
 
