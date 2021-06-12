@@ -4,34 +4,43 @@
     <meta charset='utf-8'>
   </head>
   <body>
-    <canvas id="monoscopio" width="1547">
+    <canvas id="monoscopio" width="1326" >
     </canvas>
     <script>
-      //const meH = height/2;
-      //const meW = width/2;
+      function rgbToHex(r, g, b)
+      {
+	return "#"+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);
+
+      }
+
       var c = document.getElementById ("monoscopio");
       var ct = c.getContext ("2d");
       const width = c.width;
       c.height = 13/17 * width;
       const height = c.height;
-      const linew = 1;
-
-
       const R = height/13;
       const C = width/17;
+      
+      c.width = width + R;
+      c.height = height + C;
       ct.lineWidth = 5;
-      function rgbToHex(r, g, b)
+      for (var i = 0; i < 17; ++i)
       {
-	return "#"+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);
+	ct.fillStyle = (i%2==0)?"#ffffff":"#000000";
+	console.log (i);
+	ct.fillRect (C*i+C/2,0,C, R/2);
+	ct.fillRect (C*i+C/2,R*13.5,C, R/2);
       }
+      for (var j=0;j<13; ++j)
+      {
+	ct.fillStyle = (j%2==0)?"#ffffff":"#000000";
+	ct.fillRect (0,R*j+R/2,C/2, R);
+	ct.fillRect (17.5*C,R*j+R/2,C/2, R);
+      }
+
+      ct.translate (C/2, R/2);
       ct.fillStyle = "#808080";
       ct.fillRect (0,0,width, height);
-
-
-
-
-
-
 
 
       ct.strokeStyle = "#ffffff";
@@ -40,18 +49,18 @@
       {
 	ct.beginPath ();
 	ct.moveTo (0, R*i);
-        ct.lineTo (width,C*i);
+	ct.lineTo (width,C*i);
 	ct.stroke ();
       }
       for (var j =0; j < 18;++j)
       {
 	ct.beginPath ();
 	ct.moveTo (R*j, 0);
-        ct.lineTo (R*j, height);
+	ct.lineTo (R*j, height);
 	ct.stroke ();
       }
 
-      /* Barre laterali */
+      /* -- BARRE LATERALI -- */
 
       ct.fillStyle = "#507ae9";
       ct.fillRect (2*C,R,C, 2*R);
@@ -61,7 +70,7 @@
       ct.fillRect (C,R,C, R*5.5);
       ct.fillStyle = "#be587a";
       ct.fillRect (C,6.5*R,C, 5.5*R );
-//
+
       ct.fillStyle = "#507ae9";
       ct.fillRect (C*14,R,C, 2*R);
       ct.fillStyle = "#a47a0c";
@@ -85,7 +94,6 @@
 
       ct.strokeStyle = "#ffffff";
       ct.beginPath ();
-      
       ct.moveTo (16*C, R);
       ct.lineTo (14*C, R);
       ct.lineTo (14*C, 3*R);
@@ -122,7 +130,7 @@
 	ct.fillStyle = colori[i];
 	ct.fillRect (C*(2.5+2*i),R*4,C*2, R*2);
       }
-      
+
 
       /* Onda quadra */
       var quadl = R/1.45;
@@ -166,14 +174,13 @@
       var c = 0;
       for (var i =0; i < 6; ++i)
       {
-	/* 100:255=p:x */
 	c = Math.floor (255*(i*20)/100);
 	ct.fillStyle = rgbToHex (c,c,c);
 	console.log ("#" + rgbToHex (c,c,c));
 	ct.fillRect (C*(2.5+2*i),R*9,C*2, R);
       }
 
-      /* Centrale */
+      /* -- CENTRALE -- */
       ct.fillStyle = "#000000";
       ct.fillRect (C*2.5, R*6, C*12, R);
       ct.fillRect (C*8, R*5, C, R);
@@ -202,7 +209,7 @@
       ct.moveTo (6*C, R*2);
       ct.lineTo (6*C, R*3);
       ct.stroke ();
-  
+
       /* -- GRIGLIA CENTRALE -- */
       ct.strokeStyle = "#ffffff";
       for (var i =0; i < 6; ++i)
@@ -215,12 +222,10 @@
       for (var i =6; i < 12; ++i)
       {
 	ct.beginPath ();
-	ct.beginPath ();
 	ct.moveTo (C*(3+1*i),6*R);
 	ct.lineTo (C*(3+1*i),7*R);
 	ct.stroke ();
       }
-      c.width = 2;
     </script>
   </body>
 </html>
