@@ -10,49 +10,104 @@
       function rgbToHex(r, g, b)
       {
 	return "#"+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);
-
       }
 
       var c = document.getElementById ("monoscopio");
       var ct = c.getContext ("2d");
       const width = c.width;
-      c.height = 13/17 * width;
+      const RC = 13; /* Quante righe (dominio monoscopio) */
+      const CC = 23/* 23 */; /* Quante colonne (dominio monoscopio) */
+
+      c.height = RC/CC * width;
       const height = c.height;
-      const R = height/13;
-      const C = width/17;
-      
+      const R = height/RC;
+      const C = width/CC;
+      const GRAYS = 6; /* Numero di grigi nella scala di grigi */
+
+      /* Colori YCGRGB */
+      const colori =
+      [ '#BFBF00','#00BFBF','#00BF00', '#BF00BF','#BF0000','#0000BF' ];
+
       c.width = width + R;
       c.height = height + C;
-      ct.lineWidth = 5;
-      for (var i = 0; i < 17; ++i)
+      ct.lineWidth = 3;
+      /* Converte il punto in funzione del centro del monoscopio */
+      function Mx (offt, larg=1)
       {
-	ct.fillStyle = (i%2==0)?"#ffffff":"#000000";
-	console.log (i);
-	ct.fillRect (C*i+C/2,0,C, R/2);
-	ct.fillRect (C*i+C/2,R*13.5,C, R/2);
+	if (offt==0)
+	  return CC/2*C;
+	else
+	  return ((CC/2 + offt)*C) - (0*larg * C * (offt>0?1:0));
       }
-      for (var j=0;j<13; ++j)
+      /* Converte il punto in funzione del centro del monoscopio */
+      function My (offt, rect=1)
       {
-	ct.fillStyle = (j%2==0)?"#ffffff":"#000000";
-	ct.fillRect (0,R*j+R/2,C/2, R);
-	ct.fillRect (17.5*C,R*j+R/2,C/2, R);
+	if (offt==0)
+	  return RC/2*R;
+	else
+	  return (RC/2 + offt)*R;
       }
 
+      /* -- MERLATURA -- */
+      /* Todo: Normalizza coordinate */
+      function Merlatura (ct, righe, colonne)
+      {
+	for (var i=0;i<colonne;++i)
+	{
+	  ct.fillStyle = (i%2?"#ffffff":"#000000");
+	  //Mx (-1 * (17/2-(i+0.5)))
+	  ct.fillRect (C*(i+.5),0,C, R/2);
+	  ct.fillRect (C*(i+.5),R*13.5,C, R/2);
+	}
+	for (var i=0;i<righe;++i)
+	{
+	  ct.fillStyle = (i%2?"#ffffff":"#000000");
+	  ct.fillRect (0,R*(i+.5),C/2, R);
+	  ct.fillRect (Mx(9),R*(i+.5),C/2, R);
+	}
+	ct.fillStyle = "#ffffff";
+	ct.fillRect (0,0, C/2, R/2);
+	ct.fillRect (Mx(CC/2+0.5),0, C/2, R/2);
+	ct.fillRect (0,My(7), C/2, R/2);
+	ct.fillRect (Mx(CC/2+0.5),My(7), C/2, R/2);
+      }
+      Merlatura (ct, RC, CC);
+      function quad (ct, stx, sty, dim, barre)
+      {
+	let spessore = j
+	let t = dim/barre; /* larghezza delle barre */
+	ct.strokeStyle = "#000000";
+	ct.fillStyle = "#ffffff";
+	ct.fillRect (stx, sty, dim, dim);
+	ct.lineWidth = t;
+	for (var i = 0; i < barre; ++i)
+	{
+	  ct.beginPath ();
+	  ct.moveTo (stx+t*i, sty+dim);
+	  ct.lineTo (sty+dim, 0);
+	  ct.stroke ();
+
+	}
+	ct.lineWidth = 3;
+      }
+
+
+      /* Cambia coordinate */
       ct.translate (C/2, R/2);
       ct.fillStyle = "#808080";
-      ct.fillRect (0,0,width, height);
+      ct.fillRect (0, 0, width, height);
 
 
+      /* -- GRIGLIA ESTERNA -- */
       ct.strokeStyle = "#ffffff";
-
-      for (var i =0; i < 14;++i)
+      for (var i=0;i<RC+1;++i)
       {
 	ct.beginPath ();
 	ct.moveTo (0, R*i);
 	ct.lineTo (width,C*i);
 	ct.stroke ();
       }
-      for (var j =0; j < 18;++j)
+      for (var j=0;j<CC+1;++j)
       {
 	ct.beginPath ();
 	ct.moveTo (R*j, 0);
@@ -61,184 +116,209 @@
       }
 
       /* -- BARRE LATERALI -- */
-
+      /* TODO: Normalizza coordinate */
       ct.fillStyle = "#507ae9";
-      ct.fillRect (2*C,R,C, 2*R);
+      ct.fillRect (Mx(-6.5),My(-5.5),C, 2*R);
+      ct.fillStyle = "#507ae9";
+      ct.fillRect (Mx(5.5),My(-5.5),C, 2*R);
+
       ct.fillStyle = "#a47a0c";
-      ct.fillRect (2*C,10*R,C, 2*R);
+      ct.fillRect (Mx(-6.5),My(3.5),C,2*R);
+      ct.fillStyle = "#a47a0c";
+      ct.fillRect (Mx(5.5),My(3.5),C,2*R);
+
       ct.fillStyle = "#369D7A";
-      ct.fillRect (C,R,C, R*5.5);
-      ct.fillStyle = "#be587a";
-      ct.fillRect (C,6.5*R,C, 5.5*R );
-
-      ct.fillStyle = "#507ae9";
-      ct.fillRect (C*14,R,C, 2*R);
-      ct.fillStyle = "#a47a0c";
-      ct.fillRect (C*14,10*R,C, 2*R);
+      ct.fillRect (Mx(-7.5),My(-5.5),C,R*5.5);
       ct.fillStyle = "#7a9201";
-      ct.fillRect (C*15,R,R, R*5.5);
-      ct.fillStyle = "#7a63f3";
-      ct.fillRect (C*15,6.5*R,C, 5.5*R);
+      ct.fillRect (Mx(6.5),R,R, R*5.5);
 
-      ct.beginPath ();
-      ct.moveTo (C, R);
-      ct.lineTo (3*C, R);
-      ct.lineTo (3*C, 3*R);
-      ct.lineTo (2*C, 3*R);
-      ct.lineTo (2*C, 10*R);
-      ct.lineTo (3*C, 10*R);
-      ct.lineTo (3*C, 12*R);
-      ct.lineTo (C, 12*R);
-      ct.lineTo (C, R);
-      ct.stroke ();
+      ct.fillStyle = "#be587a";
+      ct.fillRect (Mx(-7.5),My(0),C, 5.5*R);
+      ct.fillStyle = "#7a63f3";
+      ct.fillRect (Mx(6.5),My(0),C, 5.5*R);
 
       ct.strokeStyle = "#ffffff";
       ct.beginPath ();
-      ct.moveTo (16*C, R);
-      ct.lineTo (14*C, R);
-      ct.lineTo (14*C, 3*R);
-      ct.lineTo (15*C, 3*R);
-      ct.lineTo (15*C, 10*R);
-      ct.lineTo (14*C, 10*R);
-      ct.lineTo (14*C, 12*R);
-      ct.lineTo (16*C, 12*R);
-      ct.lineTo (16*C, R);
+      ct.moveTo (Mx(-7.5,0), My(-5.5,0));
+      ct.lineTo (Mx(-5.5,0), My(-5.5,0));
+      ct.lineTo (Mx(-5.5,0), My(-3.5,0));
+      ct.lineTo (Mx(-6.5,0), My(-3.5,0));
+      ct.lineTo (Mx(-6.5,0), My(3.5,0));
+      ct.lineTo (Mx(-5.5,0), My(3.5,0));
+      ct.lineTo (Mx(-5.5,0), My(5.5,0));
+      ct.lineTo (Mx(-7.5,0), My(5.5,0));
+      ct.lineTo (Mx(-7.5,0), My(-5.5,0));
+      ct.stroke ();
+
+      ct.beginPath ();
+      ct.moveTo (Mx(7.5, 0), My(-5.5,0));
+      ct.lineTo (Mx(5.5, 0), My(-5.5,0));
+      ct.lineTo (Mx(5.5, 0), My(-3.5,0));
+      ct.lineTo (Mx(6.5, 0), My(-3.5,0));
+      ct.lineTo (Mx(6.5, 0), My(3.5,0));
+      ct.lineTo (Mx(5.5, 0), My(3.5,0));
+      ct.lineTo (Mx(5.5, 0), My(5.5,0));
+      ct.lineTo (Mx(7.5, 0), My(5.5,0));
+      ct.lineTo (Mx(7.5, 0), My(-5.5,0));
       ct.stroke ();
 
 
+      /* CERCHIO --------------------------------------------*/
+      /* TODO: Non 25 */
+
+      if (CC >= 23)
+      {
+	ct.fillStyle = "#000000";
+
+	ct.beginPath ();
+	ct.arc (Mx(-9.5), My(-4.5), 1.5*R, 0, 2 * Math.PI);
+	ct.fill ();
+
+	ct.beginPath ();
+	ct.arc (Mx(9.5), My(-4.5), 1.5*R, 0, 2 * Math.PI);
+	ct.fill ();
+
+	ct.beginPath ();
+	ct.arc (Mx(9.5), My(4.5), 1.5*R, 0, 2 * Math.PI);
+	ct.fill ();
+
+	ct.beginPath ();
+	ct.arc (Mx(-9.5), My(4.5), 1.5*R, 0, 2 * Math.PI);
+	ct.fill ();
+      
+	quad (ct, Mx (-9.5), My (-2.5), C*2, 100);
+	quad (ct, Mx (-9.5), My (0.5), C*2, 100);
+	quad (ct, Mx (7.5), My (-2.5), C*2, 100);
+	quad (ct, Mx (7.5), My (0.5), C*2, 100);
+
+
+	ct.lineWidth = 6;
+
+	
+	ct.lineWidth = 3;
+      }
       ct.beginPath ();
-      ct.arc ((width/2), (height/2), width*6/17, 0, 2 * Math.PI);
+      ct.arc (Mx(0), My(0), R*6, 0, 2 * Math.PI);
       ct.fillStyle = "#ffffff";
       ct.fill ();
-
-      ct.moveTo ((width/2), (height/2));
-      ct.arc ((width/2), (height/2), width*6/17, 0, 2 * Math.PI);
+      ct.moveTo (Mx(0), My(0));
+      ct.arc (Mx(0), My(0), R*6, 0, 2 * Math.PI);
       ct.clip ();
+      ct.fillStyle = "#ffffff";
+      ct.fillRect (Mx(-6), My(-5.5), 12*C, 12*R);
 
+      /*-- BARRA IN ALTO --*/
       ct.fillStyle = "#000000";
-      ct.fillRect (C*6.5,R,C*4, R);
+      ct.fillRect (Mx(-2),My(-5.5),4*C,R);
+      ct.strokeStyle = "#ff00ff";
+      ct.fillStyle = "#000000";
+      ct.fillRect (Mx(-3),My(3.5),6*C,R);
       ct.strokeStyle = "#ff00ff";
 
-      ct.fillStyle = "#000000";
-      ct.fillRect (C*5.5,R*10,C*6, R);
-      ct.strokeStyle = "#ff00ff";
-
-      /* Colori primari */
-      var colori = ['#bfbf00', '#00bfbf', '#00bf00', '#bf00bf', '#bf0000', '#0000bf'];
+      /* -- COLORI PRIMARI -- */
       for (var i =0; i < 6; ++i)
       {
 	ct.fillStyle = colori[i];
-	ct.fillRect (C*(2.5+2*i),R*4,C*2, R*2);
+	ct.fillRect (Mx (-1 * (17/2-(2.5+2*i))),R*4,C*2, R*2);
       }
 
 
-      /* Onda quadra */
+      /* -- ONDA QUADRA -- */
       var quadl = R/1.45;
-      var bas = 2.5*C;
+      var bas = Mx (-1 * (17/2-2.5));
       var i = 0;
-      while (bas < 14.5*C)
+      while (bas<Mx(6))
       {
-	ct.fillStyle = (i%2==0) ? "#000000" : "#aaaaaa";
+
+	ct.fillStyle = (i%2?"#000000":"#aaaaaa");
 	ct.fillRect (bas, R*3, quadl, R);
 	bas += quadl;
 	++i;
       }
 
-
-      /* Timing y/c */
+      /* -- TIMING Y/C -- */
       ct.fillStyle = "#bfbf00";
-      ct.fillRect (C*2.5, R*11, C*5.5, R*2);
-      ct.fillRect (C*9, R*11, C*5.5, R*2);
+      ct.fillRect (Mx(-6), My(4.5), C*6.5, R*2);
+      ct.fillRect (Mx(.5), My(4.5), C*5.5, R*2);
       ct.fillStyle = "#bf0000";
-      ct.fillRect (C*8, R*11, C, R*2);
+      ct.fillRect (Mx(-0.5), My(4.5), C, R*2);
 
       ct.fillStyle = "#000000";
-      ct.fillRect (C*3.5, R*2, C*2, R);
-      ct.fillRect (C*11.5, R*2, C*2, R);
+      ct.fillRect (Mx(-5), My(-4.5), C*2, R);
+      ct.fillRect (Mx(3), My(-4.5), C*2, R);
 
-      /* Sinusoidi */
+      /* -- LINEE SINUSOIDI -- */
       ct.fillStyle = "#000000";
-      ct.fillRect (C*2.5, R*7, C, R*2);
-      ct.fillRect (C*13.5, R*7, C, R*2);
-      var grad;
-      var w;
-      var bas;
-      var dt = [5,10,15,25,30];
-      for (var i=0; i < 5;++i)
+      ct.fillRect (Mx(-6), My(0.5), C, R*2);
+      ct.fillRect (Mx(5), My(0.5), C, R*2);
+      var dt = [5,10,15,25,30]; /* Quanti cambi in una sezione */
+      for (var i=0;i<5;++i)
       {
-	for (var j = 0; j < dt[i]; ++j)
-        {
-	w = (2*C)/dt[i];
-	bas = (3.5*C) + 2*C*i;
-	grad = ct.createLinearGradient (bas + w *j, 0, bas + w *j + w, 0);
-	grad.addColorStop (0, "black");
-	grad.addColorStop (.2, "gray");
-	grad.addColorStop (.5, "white");
-	grad.addColorStop (.8, "gray");
-	grad.addColorStop (1, "black");
-	ct.fillStyle = grad;
-	console.log (ct.fillStyle);
-	ct.fillRect (bas + w *j, 7*R, w, 2*R);
+	for (var j=0;j<dt[i];++j)
+	{
+	  let w = (2*C)/dt[i];
+	  let bas = Mx (-1 * (17/2-(3.5 + 2*i)));
+	  let grad = ct.createLinearGradient (bas + w *j, 0, bas + w *j + w, 0);
+	  grad.addColorStop (0, "black");
+	  grad.addColorStop (.2, "gray");
+	  grad.addColorStop (.5, "white");
+	  grad.addColorStop (.8, "gray");
+	  grad.addColorStop (1, "black");
+	  ct.fillStyle = grad;
+	  console.log (ct.fillStyle);
+	  ct.fillRect (bas + w *j, 7*R, w, 2*R);
 	}
       }
 
 
-      /* Scala di grigi */
-      var c = 0;
-      for (var i =0; i < 6; ++i)
+      /* -- SCALA DI GRIGI -- */
+      for (var i=0;i<GRAYS;++i)
       {
-	c = Math.floor (255*(i*20)/100);
+        /* Salti di +20% */
+	let c = Math.floor ((0xff*i*(100/(GRAYS - 1)))/100);
 	ct.fillStyle = rgbToHex (c,c,c);
-	//console.log ("#" + rgbToHex (c,c,c));
-	ct.fillRect (C*(2.5+2*i),R*9,C*2, R);
+	ct.fillRect (Mx (-1 * (17/2-(2.5+2*i))),R*9,C*2, R);
       }
 
       /* -- CENTRALE -- */
       ct.fillStyle = "#000000";
-      ct.fillRect (C*2.5, R*6, C*12, R);
-      ct.fillRect (C*8, R*5, C, R);
-      ct.fillRect (C*8, R*7, C, R);
+      ct.fillRect (Mx(-6), My(-0.5), 12*C, R);
+      ct.fillRect (Mx(-0.5), My(-1.5), C, R);
+      ct.fillRect (Mx(-0.5), My(0.5), C, R);
 
       ct.beginPath ();
       ct.strokeStyle = "#ffffff";
-      ct.moveTo (2.5*C, R*6.5);
-      ct.lineTo (C*14.5, R*6.5);
+      ct.moveTo (Mx(-6), My(0));
+      ct.lineTo (Mx(6), My(0));
       ct.stroke ();
       ct.beginPath ();
-      ct.moveTo (8.5*C, R*5);
-      ct.lineTo (8.5*C, R*8);
+      ct.moveTo (Mx(0), My(-1.5));
+      ct.lineTo (Mx(0), My(1.5));
       ct.stroke ();
 
 
       /* -- SPILLI -- */
-
-      ct.beginPath ();
       ct.strokeStyle = "#ffffff";
-      ct.moveTo (6*C, R*10);
-      ct.lineTo (6*C, R*11);
-      ct.stroke ();
       ct.beginPath ();
+      ct.moveTo (Mx(-2.5), My(3.5));
+      ct.lineTo (Mx(-2.5), My(4.5));
+      ct.stroke ();
       ct.strokeStyle = "#000000";
-      ct.moveTo (6*C, R*2);
-      ct.lineTo (6*C, R*3);
+      ct.beginPath ();
+      ct.moveTo (Mx(-2.5), My(-4.5));
+      ct.lineTo (Mx(-2.5), My(-3.5));
       ct.stroke ();
 
       /* -- GRIGLIA CENTRALE -- */
       ct.strokeStyle = "#ffffff";
-      for (var i =0; i < 6; ++i)
+      for (var i=0;i<12;++i)
       {
 	ct.beginPath ();
-	ct.moveTo (C*(3+1*i),6*R);
-	ct.lineTo (C*(3+1*i),7*R);
+	ct.moveTo (Mx (-1 * (17/2-(3+1*i))),6*R);
+	ct.lineTo (Mx (-1 * (17/2-(3+1*i))),7*R);
 	ct.stroke ();
       }
-      for (var i =6; i < 12; ++i)
-      {
-	ct.beginPath ();
-	ct.moveTo (C*(3+1*i),6*R);
-	ct.lineTo (C*(3+1*i),7*R);
-	ct.stroke ();
-      }
+
     </script>
   </body>
 </html>
