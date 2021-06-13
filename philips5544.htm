@@ -74,20 +74,23 @@
       Merlatura (ct, RC, CC);
       function quad (ct, stx, sty, dim, barre)
       {
-	let spessore = j
-	let t = dim/barre; /* larghezza delle barre */
+	ct.save ();
 	ct.strokeStyle = "#000000";
-	ct.fillStyle = "#ffffff";
-	ct.fillRect (stx, sty, dim, dim);
-	ct.lineWidth = t;
-	for (var i = 0; i < barre; ++i)
+	ct.lineWidth = 1;
+	ct.beginPath();
+	ct.rect (stx, sty, dim, dim);
+	ct.clip();
+	var thickness = dim/barre;
+	ct.lineWidth =thickness;
+	for (var i=0;i < dim*2;i++)
 	{
 	  ct.beginPath ();
-	  ct.moveTo (stx+t*i, sty+dim);
-	  ct.lineTo (sty+dim, 0);
-	  ct.stroke ();
-
+	  ct.strokeStyle = (i%2)?"#ffffff":"#000000";
+	  ct.moveTo(stx+i*thickness+thickness/2-dim,sty);
+	  ct.lineTo(stx+i*thickness+thickness,dim+sty);
+	  ct.stroke();
 	}
+	ct.restore ();
 	ct.lineWidth = 3;
       }
 
@@ -186,10 +189,10 @@
 	ct.arc (Mx(-9.5), My(4.5), 1.5*R, 0, 2 * Math.PI);
 	ct.fill ();
       
-	quad (ct, Mx (-9.5), My (-2.5), C*2, 100);
-	quad (ct, Mx (-9.5), My (0.5), C*2, 100);
-	quad (ct, Mx (7.5), My (-2.5), C*2, 100);
-	quad (ct, Mx (7.5), My (0.5), C*2, 100);
+	quad (ct, Mx (-9.5), My (-2.5), C*2, 30);
+	quad (ct, Mx (-9.5), My (0.5), C*2, 20);
+	quad (ct, Mx (7.5), My (-2.5), C*2, 30);
+	quad (ct, Mx (7.5), My (0.5), C*2, 20);
 
 
 	ct.lineWidth = 6;
