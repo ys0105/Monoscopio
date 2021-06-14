@@ -15,12 +15,31 @@
 
       var c = document.getElementById ("monoscopio");
       var ct = c.getContext ("2d");
+      var circle = false;
+      var laterali = false;
+      var croce = true;
+      const p = ["PM5544","PM5368","PM5644"];
+      var pattern = p[0];
       const width = c.width;
-      const RC = 13; /* Quante righe (dominio monoscopio) */
-      const CC = 23/* 23 */; /* Quante colonne (dominio monoscopio) */
+      var RC = 13; /* Quante righe (dominio monoscopio) */
+      var CC = 17/* 23 */; /* Quante colonne (dominio monoscopio) */
       const gridW = 1;
+      switch (pattern)
+      {
+	case "PM5544":
+	  circle = true;
+	break;
+	case "PM5644":
+	  CC = 23;
+	  circle = true;
+	break;
+	case "PM5538":
+	  circle = false;
+	break;
 
-      c.height = RC/CC * width;
+      }
+
+      c.height = RC/CC * (width+.5);
       const height = c.height;
       const R = height/RC;
       const C = width/CC;
@@ -164,50 +183,53 @@
 
       /* -- BARRE LATERALI -- */
       /* TODO: Normalizza coordinate */
-      ct.fillStyle = "#507ae9";
-      ct.fillRect (Mx(-6.5),My(-5.5),C, 2*R);
-      ct.fillStyle = "#507ae9";
-      ct.fillRect (Mx(5.5),My(-5.5),C, 2*R);
+      if (laterali)
+      {
+	ct.fillStyle = "#507ae9";
+	ct.fillRect (Mx(-6.5),My(-5.5),C, 2*R);
+	ct.fillStyle = "#507ae9";
+	ct.fillRect (Mx(5.5),My(-5.5),C, 2*R);
 
-      ct.fillStyle = "#a47a0c";
-      ct.fillRect (Mx(-6.5),My(3.5),C,2*R);
-      ct.fillStyle = "#a47a0c";
-      ct.fillRect (Mx(5.5),My(3.5),C,2*R);
+	ct.fillStyle = "#a47a0c";
+	ct.fillRect (Mx(-6.5),My(3.5),C,2*R);
+	ct.fillStyle = "#a47a0c";
+	ct.fillRect (Mx(5.5),My(3.5),C,2*R);
 
-      ct.fillStyle = "#369D7A";
-      ct.fillRect (Mx(-7.5),My(-5.5),C,R*5.5);
-      ct.fillStyle = "#7a9201";
-      ct.fillRect (Mx(6.5),R,R, R*5.5);
+	ct.fillStyle = "#369D7A";
+	ct.fillRect (Mx(-7.5),My(-5.5),C,R*5.5);
+	ct.fillStyle = "#7a9201";
+	ct.fillRect (Mx(6.5),R,R, R*5.5);
 
-      ct.fillStyle = "#be587a";
-      ct.fillRect (Mx(-7.5),My(0),C, 5.5*R);
-      ct.fillStyle = "#7a63f3";
-      ct.fillRect (Mx(6.5),My(0),C, 5.5*R);
+	ct.fillStyle = "#be587a";
+	ct.fillRect (Mx(-7.5),My(0),C, 5.5*R);
+	ct.fillStyle = "#7a63f3";
+	ct.fillRect (Mx(6.5),My(0),C, 5.5*R);
 
-      ct.strokeStyle = "#ffffff";
-      ct.beginPath ();
-      ct.moveTo (Mx(-7.5,0), My(-5.5,0));
-      ct.lineTo (Mx(-5.5,0), My(-5.5,0));
-      ct.lineTo (Mx(-5.5,0), My(-3.5,0));
-      ct.lineTo (Mx(-6.5,0), My(-3.5,0));
-      ct.lineTo (Mx(-6.5,0), My(3.5,0));
-      ct.lineTo (Mx(-5.5,0), My(3.5,0));
-      ct.lineTo (Mx(-5.5,0), My(5.5,0));
-      ct.lineTo (Mx(-7.5,0), My(5.5,0));
-      ct.lineTo (Mx(-7.5,0), My(-5.5,0));
-      ct.stroke ();
+	ct.strokeStyle = "#ffffff";
+	ct.beginPath ();
+	ct.moveTo (Mx(-7.5,0), My(-5.5,0));
+	ct.lineTo (Mx(-5.5,0), My(-5.5,0));
+	ct.lineTo (Mx(-5.5,0), My(-3.5,0));
+	ct.lineTo (Mx(-6.5,0), My(-3.5,0));
+	ct.lineTo (Mx(-6.5,0), My(3.5,0));
+	ct.lineTo (Mx(-5.5,0), My(3.5,0));
+	ct.lineTo (Mx(-5.5,0), My(5.5,0));
+	ct.lineTo (Mx(-7.5,0), My(5.5,0));
+	ct.lineTo (Mx(-7.5,0), My(-5.5,0));
+	ct.stroke ();
 
-      ct.beginPath ();
-      ct.moveTo (Mx(7.5, 0), My(-5.5,0));
-      ct.lineTo (Mx(5.5, 0), My(-5.5,0));
-      ct.lineTo (Mx(5.5, 0), My(-3.5,0));
-      ct.lineTo (Mx(6.5, 0), My(-3.5,0));
-      ct.lineTo (Mx(6.5, 0), My(3.5,0));
-      ct.lineTo (Mx(5.5, 0), My(3.5,0));
-      ct.lineTo (Mx(5.5, 0), My(5.5,0));
-      ct.lineTo (Mx(7.5, 0), My(5.5,0));
-      ct.lineTo (Mx(7.5, 0), My(-5.5,0));
-      ct.stroke ();
+	ct.beginPath ();
+	ct.moveTo (Mx(7.5, 0), My(-5.5,0));
+	ct.lineTo (Mx(5.5, 0), My(-5.5,0));
+	ct.lineTo (Mx(5.5, 0), My(-3.5,0));
+	ct.lineTo (Mx(6.5, 0), My(-3.5,0));
+	ct.lineTo (Mx(6.5, 0), My(3.5,0));
+	ct.lineTo (Mx(5.5, 0), My(3.5,0));
+	ct.lineTo (Mx(5.5, 0), My(5.5,0));
+	ct.lineTo (Mx(7.5, 0), My(5.5,0));
+	ct.lineTo (Mx(7.5, 0), My(-5.5,0));
+	ct.stroke ();
+      }
 
 
       /* CERCHIO --------------------------------------------*/
@@ -244,16 +266,18 @@
 
 	ct.lineWidth = 3;
       }
-      ct.save ();
-      ct.beginPath ();
-      ct.arc (Mx(0), My(0), R*6, 0, 2 * Math.PI);
+      if (circle)
+      {
+	ct.save ();
+	ct.beginPath ();
+	ct.fillStyle = "#ffffff";
+	Cerchio (ct, Mx(0), My(0), R*6);
+	ct.moveTo (Mx(0), My(0));
+	ct.arc (Mx(0), My(0), R*6, 0, 2 * Math.PI);
+	ct.clip ();
+      }
       ct.fillStyle = "#ffffff";
-      ct.fill ();
-      ct.moveTo (Mx(0), My(0));
-      ct.arc (Mx(0), My(0), R*6, 0, 2 * Math.PI);
-      ct.clip ();
-      ct.fillStyle = "#ffffff";
-      ct.fillRect (Mx(-6), My(-5.5), 12*C, 12*R);
+      ct.fillRect (Mx(-6), My(-5.5), 12*C, 11.5*R);
 
       /*-- BARRA IN ALTO --*/
       ct.fillStyle = "#000000";
@@ -272,22 +296,18 @@
 
 
       /* -- ONDA QUADRA -- */
-      var quadl = R/1.45;
+      var quadl = C*12/18;
       var bas = Mx (-1 * (17/2-2.5));
-      var i = 0;
-      while (bas<Mx(6))
+      for (var i=0;i<18;++i)
       {
-
-	ct.fillStyle = (i%2?"#000000":"#aaaaaa");
-	ct.fillRect (bas, R*3, quadl, R);
+	ct.fillStyle=(i%2?"#000000":"#aaaaaa");
+	ct.fillRect (bas, My(-3.5), quadl, R);
 	bas += quadl;
-	++i;
       }
-
       /* -- TIMING Y/C -- */
       ct.fillStyle = "#bfbf00";
-      ct.fillRect (Mx(-6), My(4.5), C*6.5, R*2);
-      ct.fillRect (Mx(.5), My(4.5), C*5.5, R*2);
+      ct.fillRect (Mx(-6), My(4.5), C*6.5, R*1.5);
+      ct.fillRect (Mx(.5), My(4.5), C*5.5, R*1.5);
       ct.fillStyle = "#bf0000";
       ct.fillRect (Mx(-0.5), My(4.5), C, R*2);
 
@@ -330,18 +350,19 @@
       /* -- CENTRALE -- */
       ct.fillStyle = "#000000";
       ct.fillRect (Mx(-6), My(-0.5), 12*C, R);
-      ct.fillRect (Mx(-0.5), My(-1.5), C, R);
-      ct.fillRect (Mx(-0.5), My(0.5), C, R);
-
-      ct.beginPath ();
-      ct.strokeStyle = "#ffffff";
-      ct.moveTo (Mx(-6), My(0));
-      ct.lineTo (Mx(6), My(0));
-      ct.stroke ();
-      ct.beginPath ();
-      ct.moveTo (Mx(0), My(-1.5));
-      ct.lineTo (Mx(0), My(1.5));
-      ct.stroke ();
+      if (croce)
+      {
+	ct.fillRect (Mx(-0.5), My(-1.5), C, 3*R);
+	ct.beginPath ();
+	ct.strokeStyle = "#ffffff";
+	ct.moveTo (Mx(-6), My(0));
+	ct.lineTo (Mx(6), My(0));
+	ct.stroke ();
+	ct.beginPath ();
+	ct.moveTo (Mx(0), My(-1.5));
+	ct.lineTo (Mx(0), My(1.5));
+	ct.stroke ();
+      }
 
       ct.lineWidth = gridW;
       /* -- SPILLI -- */
