@@ -18,8 +18,9 @@
       var circle = false;
       var laterali = false;
       var croce = true;
+      var time = false;
       const p = ["PM5544","PM5368","PM5644"];
-      var pattern = p[0];
+      var pattern = p[2];
       const width = c.width;
       var RC = 13; /* Quante righe (dominio monoscopio) */
       var CC = 17/* 23 */; /* Quante colonne (dominio monoscopio) */
@@ -39,11 +40,11 @@
 
       }
 
-      c.height = RC/CC * (width+.5);
+      c.height = RC/CC * width;
       const height = c.height;
       const R = height/RC;
       const C = width/CC;
-      const GRAYS = 6; /* Numero di grigi nella scala di grigi */
+      const GRAYS = 17 /*6*/; /* Numero di grigi nella scala di grigi */
 
       /* Colori YCGRGB */
       const colori=['#BFBF00','#00BFBF','#00BF00','#BF00BF','#BF0000','#0000BF'];
@@ -51,6 +52,7 @@
       c.width = width + R;
       c.height = height + C;
       ct.lineWidth = 3;
+
       /* Converte il punto in funzione del centro del monoscopio */
       function Mx (offt, larg=1)
       {
@@ -158,31 +160,17 @@
       }
 
 
-      /* Cambia coordinate */
+      /* Cambia sistema di coordinate (dopo merlatura) */
       ct.translate (C/2, R/2);
-      ct.fillStyle = "#808080";
+      ct.fillStyle = "#808080"; /* COLORE GRIGLIA ESTERNA */
       ct.fillRect (0, 0, width, height);
-
 
       /* -- GRIGLIA ESTERNA -- */
       ct.strokeStyle = "#ffffff";
-      for (var i=0;i<RC+1;++i)
-      {
-	ct.beginPath ();
-	ct.moveTo (0, R*i);
-	ct.lineTo (width,C*i);
-	ct.stroke ();
-      }
-      for (var j=0;j<CC+1;++j)
-      {
-	ct.beginPath ();
-	ct.moveTo (R*j, 0);
-	ct.lineTo (R*j, height);
-	ct.stroke ();
-      }
+      for (var i=0;i<RC+1;++i) Linea (ct, 0, R*i, width, C*i);
+      for (var j=0;j<CC+1;++j) Linea (ct, R*j, 0, R*j, height);
 
       /* -- BARRE LATERALI -- */
-      /* TODO: Normalizza coordinate */
       if (laterali)
       {
 	ct.fillStyle = "#507ae9";
@@ -205,6 +193,7 @@
 	ct.fillStyle = "#7a63f3";
 	ct.fillRect (Mx(6.5),My(0),C, 5.5*R);
 
+	/* TODO: SIMMETRICO, RIDUCI CODICE */
 	ct.strokeStyle = "#ffffff";
 	ct.beginPath ();
 	ct.moveTo (Mx(-7.5,0), My(-5.5,0));
@@ -232,8 +221,7 @@
       }
 
 
-      /* CERCHIO --------------------------------------------*/
-
+      /* CERCHIO! (Inizia la parte divertente) */
       if (CC >= 23)
       {
 	ct.fillStyle = "#000000";
@@ -246,8 +234,8 @@
 	quad (ct, Mx (-9.5), My (0.5), C*2, 20,0);
 	quad (ct, Mx (7.5), My (-2.5), C*2, 30,0);
 	quad (ct, Mx (7.5), My (0.5), C*2, 20);
+
 	ct.lineWidth = 4;
-	
 	ct.strokeStyle = "#ffffff";
 	/* Todo: 1/4 e` una costante */
 	Linea (ct, Mx(-0.5+1/4),My(-6.2),Mx(0.5-1/4), My(-6.2));
@@ -263,7 +251,6 @@
 	Linea (ct, Mx(-10.75),My(-.5+1/8),Mx(-10.75),My(+.5-1/8));
 	Linea (ct, Mx(-11),My(-.5+1/8),Mx(-11),My(+.5-1/8));
 	Linea (ct, Mx(-11.25),My(-.5+1/8),Mx(-11.25),My(+.5-1/8));
-
 	ct.lineWidth = 3;
       }
       if (circle)
@@ -279,43 +266,41 @@
       ct.fillStyle = "#ffffff";
       ct.fillRect (Mx(-6), My(-5.5), 12*C, 11.5*R);
 
-      /*-- BARRA IN ALTO --*/
+      /*-- BARRA NERA IN ALTO --*/
       ct.fillStyle = "#000000";
       ct.fillRect (Mx(-2),My(-5.5),4*C,R);
-      ct.strokeStyle = "#ff00ff";
-      ct.fillStyle = "#000000";
       ct.fillRect (Mx(-3),My(3.5),6*C,R);
-      ct.strokeStyle = "#ff00ff";
-
-      /* -- COLORI PRIMARI -- */
-      for (var i =0; i < 6; ++i)
-      {
-	ct.fillStyle = colori[i];
-	ct.fillRect (Mx (-1 * (17/2-(2.5+2*i))),R*4,C*2, R*2);
-      }
-
 
       /* -- ONDA QUADRA -- */
       var quadl = C*12/18;
-      var bas = Mx (-1 * (17/2-2.5));
+      var bas = Mx (-6);
       for (var i=0;i<18;++i)
       {
 	ct.fillStyle=(i%2?"#000000":"#aaaaaa");
 	ct.fillRect (bas, My(-3.5), quadl, R);
 	bas += quadl;
       }
+
+      /* -- COLORI PRIMARI -- */
+      for (var i=0;i<colori.length;++i)
+      {
+	ct.fillStyle = colori[i];
+	ct.fillRect (Mx (-(8.5-(2.5+2*i))),My(-2.5),C*2, R*2);
+      }
+
+
       /* -- TIMING Y/C -- */
       ct.fillStyle = "#bfbf00";
       ct.fillRect (Mx(-6), My(4.5), C*6.5, R*1.5);
       ct.fillRect (Mx(.5), My(4.5), C*5.5, R*1.5);
       ct.fillStyle = "#bf0000";
-      ct.fillRect (Mx(-0.5), My(4.5), C, R*2);
+      ct.fillRect (Mx(-0.5), My(4.5), C, R*1.5);
 
       ct.fillStyle = "#000000";
       ct.fillRect (Mx(-5), My(-4.5), C*2, R);
       ct.fillRect (Mx(3), My(-4.5), C*2, R);
 
-      /* -- LINEE SINUSOIDI -- */
+      /* -- LINEE SINUSOIDALI -- */
       ct.fillStyle = "#000000";
       ct.fillRect (Mx(-6), My(0.5), C, R*2);
       ct.fillRect (Mx(5), My(0.5), C, R*2);
@@ -325,8 +310,8 @@
 	for (var j=0;j<dt[i];++j)
 	{
 	  let w = (2*C)/dt[i];
-	  let bas = Mx (-1 * (17/2-(3.5 + 2*i)));
-	  let grad = ct.createLinearGradient (bas + w *j, 0, bas + w *j + w, 0);
+	  let bas = Mx (-(8.5-(3.5+2*i)));
+	  let grad = ct.createLinearGradient (bas+w*j,0,bas+w*j+w,0);
 	  grad.addColorStop (0, "black");
 	  grad.addColorStop (.2, "gray");
 	  grad.addColorStop (.5, "white");
@@ -341,12 +326,12 @@
       /* -- SCALA DI GRIGI -- */
       for (var i=0;i<GRAYS;++i)
       {
-        /* Salti di +20% */
-	let c = Math.floor ((0xff*i*(100/(GRAYS - 1)))/100);
+	let c = Math.floor ((0xff*i*(100/(GRAYS-1)))/100);
 	ct.fillStyle = rgbToHex (c,c,c);
-	ct.fillRect (Mx (-1 * (17/2-(2.5+2*i))),R*9,C*2, R);
+	ct.fillRect (Mx(-(8.5-(2.5+((12/GRAYS)*i)))),My(2.5),C*12/GRAYS, R);
       }
 
+      ct.lineWidth = gridW;
       /* -- CENTRALE -- */
       ct.fillStyle = "#000000";
       ct.fillRect (Mx(-6), My(-0.5), 12*C, R);
@@ -355,37 +340,37 @@
 	ct.fillRect (Mx(-0.5), My(-1.5), C, 3*R);
 	ct.beginPath ();
 	ct.strokeStyle = "#ffffff";
-	ct.moveTo (Mx(-6), My(0));
-	ct.lineTo (Mx(6), My(0));
-	ct.stroke ();
-	ct.beginPath ();
-	ct.moveTo (Mx(0), My(-1.5));
-	ct.lineTo (Mx(0), My(1.5));
-	ct.stroke ();
+	Linea (ct,Mx(-6),My(0),Mx(6),My(0));
+	Linea (ct,Mx(0),My(-1.5),Mx(0),My(1.5));
       }
 
-      ct.lineWidth = gridW;
       /* -- SPILLI -- */
       ct.strokeStyle = "#ffffff";
-      ct.beginPath ();
-      ct.moveTo (Mx(-2.5), My(3.5));
-      ct.lineTo (Mx(-2.5), My(4.5));
-      ct.stroke ();
+      Linea (ct, Mx(-2.5),My(+3.5),Mx(-2.5),My(+4.5));
       ct.strokeStyle = "#000000";
-      ct.beginPath ();
-      ct.moveTo (Mx(-2.5), My(-4.5));
-      ct.lineTo (Mx(-2.5), My(-3.5));
-      ct.stroke ();
+      Linea (ct, Mx(-2.5),My(-3.5),Mx(-2.5),My(-4.5));
 
       /* -- GRIGLIA CENTRALE -- */
       ct.strokeStyle = "#ffffff";
-      for (var i=0;i<12;++i)
+      if (!time)
       {
-	ct.beginPath ();
-	ct.moveTo (Mx (-1 * (17/2-(3+1*i))),6*R);
-	ct.lineTo (Mx (-1 * (17/2-(3+1*i))),7*R);
-	ct.stroke ();
+	for (var i=0;i<12;++i)
+	{
+	  ct.beginPath ();
+	  ct.moveTo (Mx (-(8.5-(3+1*i))),My(-.5));
+	  ct.lineTo (Mx (-(8.5-(3+1*i))),My(+.5));
+	  ct.stroke ();
+	}
       }
+      else
+      {
+	Linea (ct, Mx(-5.5), My(-.5), Mx(-5.5), My(+.5));
+	Linea (ct, Mx(+5.5), My(-.5), Mx(+5.5), My(+.5));
+	Linea (ct, Mx(+0.5), My(-.5), Mx(+0.5), My(+.5));
+	Linea (ct, Mx(-0.5), My(-.5), Mx(-0.5), My(+.5));
+      }
+      if(circle)
+	ct.restore ();
     </script>
   </body>
 </html>
