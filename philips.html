@@ -5,6 +5,7 @@
   </head>
   <body>
     <canvas id="monoscopio" width="1955" >
+      Il browser non supporta i canvas
     </canvas>
     <script>
       function rgbToHex(r, g, b)
@@ -206,27 +207,27 @@
 	/* TODO: SIMMETRICO, RIDUCI CODICE */
 	ct.strokeStyle = "#ffffff";
 	ct.beginPath ();
-	ct.moveTo (Mx(-7.5,0), My(-5.5,0));
-	ct.lineTo (Mx(-5.5,0), My(-5.5,0));
-	ct.lineTo (Mx(-5.5,0), My(-3.5,0));
-	ct.lineTo (Mx(-6.5,0), My(-3.5,0));
-	ct.lineTo (Mx(-6.5,0), My(3.5,0));
-	ct.lineTo (Mx(-5.5,0), My(3.5,0));
-	ct.lineTo (Mx(-5.5,0), My(5.5,0));
-	ct.lineTo (Mx(-7.5,0), My(5.5,0));
-	ct.lineTo (Mx(-7.5,0), My(-5.5,0));
+	ct.moveTo (Mx(-7.5), My(-5.5));
+	ct.lineTo (Mx(-5.5), My(-5.5));
+	ct.lineTo (Mx(-5.5), My(-3.5));
+	ct.lineTo (Mx(-6.5), My(-3.5));
+	ct.lineTo (Mx(-6.5), My(3.5));
+	ct.lineTo (Mx(-5.5), My(3.5));
+	ct.lineTo (Mx(-5.5), My(5.5));
+	ct.lineTo (Mx(-7.5), My(5.5));
+	ct.lineTo (Mx(-7.5), My(-5.5));
 	ct.stroke ();
 
 	ct.beginPath ();
-	ct.moveTo (Mx(7.5, 0), My(-5.5,0));
-	ct.lineTo (Mx(5.5, 0), My(-5.5,0));
-	ct.lineTo (Mx(5.5, 0), My(-3.5,0));
-	ct.lineTo (Mx(6.5, 0), My(-3.5,0));
-	ct.lineTo (Mx(6.5, 0), My(3.5,0));
-	ct.lineTo (Mx(5.5, 0), My(3.5,0));
-	ct.lineTo (Mx(5.5, 0), My(5.5,0));
-	ct.lineTo (Mx(7.5, 0), My(5.5,0));
-	ct.lineTo (Mx(7.5, 0), My(-5.5,0));
+	ct.moveTo (Mx(7.5), My(-5.5));
+	ct.lineTo (Mx(5.5), My(-5.5));
+	ct.lineTo (Mx(5.5), My(-3.5));
+	ct.lineTo (Mx(6.5), My(-3.5));
+	ct.lineTo (Mx(6.5), My(3.5));
+	ct.lineTo (Mx(5.5), My(3.5));
+	ct.lineTo (Mx(5.5), My(5.5));
+	ct.lineTo (Mx(7.5), My(5.5));
+	ct.lineTo (Mx(7.5), My(-5.5));
 	ct.stroke ();
       }
 
@@ -244,6 +245,7 @@
 	quad (ct, Mx (-9.5), My (0.5), X*2, 20,0);
 	quad (ct, Mx (7.5), My (-2.5), X*2, 30,0);
 	quad (ct, Mx (7.5), My (0.5), X*2, 20);
+
 	GradH (ct, Mx(-10.5), My(-2.5), X, 5*X);
 	GradH (ct, Mx(+9.5), My(-2.5), X, 5*X);
 
@@ -265,6 +267,7 @@
 	Linea (ct, Mx(-11.25),My(-.5+1/8),Mx(-11.25),My(+.5-1/8));
 	ct.lineWidth = 3;
       }
+
       if (circle)
       {
 	ct.save ();
@@ -314,8 +317,8 @@
 
       /* -- LINEE SINUSOIDALI -- */
       ct.fillStyle = "#000000";
-      ct.fillRect (Mx(-6), My(0.5), X, X*2);
-      ct.fillRect (Mx(+5), My(0.5), X, X*2);
+      ct.fillRect (Mx(-6), My(0.5), X, 2*X);
+      ct.fillRect (Mx(+5), My(0.5), X, 2*X);
       var dt = [5,10,15,25,30]; /* Quanti cambi in una sezione */
       for (var i=0;i<5;++i)
       {
