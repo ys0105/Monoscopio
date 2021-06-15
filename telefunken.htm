@@ -12,30 +12,22 @@
       {
 	return "#"+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);
       }
-
       var c = document.getElementById ("monoscopio");
       var ct = c.getContext ("2d");
-      var circle = false;
-      var laterali = true;
-      var croce = true;
-      var time = false;
-      const p = ["PM5544","PM5368","PM5644"];
-      var pattern = p[0];
       const width = c.width;
       var RC = 14; /* Quante righe (dominio monoscopio) */
       var CC = 18;
-      const CD = 12; /* DIAMETRO DEL CERCHIO */
-      const gridW = 1;
+      var CD =12;
       c.height = RC/CC * width;
       const height = c.height;
       const X = width/CC;
-      const GRAYS = 5;
+      const GRAYS = 11;
 
       /* Colori YCGRGB */
       const colori=['#bfbfbf','#BFBF00','#00BFBF','#00BF00','#BF00BF','#BF0000','#0000BF','#000000'];
 
-      c.width = width+X;
-      c.height = height+X;
+      c.width = width;
+      c.height = height;
       ct.lineWidth = 6;
 
       /* Converte il punto in funzione del centro del monoscopio */
@@ -95,39 +87,41 @@
       ct.fillStyle = "#000000";
       ct.fillRect (Mx(-6+2.4), My(0), 2.4*X*3, X)
 
-      /* -- LINEE SINUSOIDALI -- */
-      //ct.fillStyle = "#000000";
-      //ct.fillRect (Mx(-6), My(0.5), X, X*2);
-      //ct.fillRect (Mx(+5), My(0.5), X, X*2);
-      //var dt = [5,10,15,25,30]; /* Quanti cambi in una sezione */
-      //for (var i=0;i<5;++i)
-      //{
-	//for (var j=0;j<dt[i];++j)
-	//{
-	  //let w = 2*X/dt[i];
-	  //let bas = Mx (-(8.5-(3.5+2*i)));
-	  //let grad = ct.createLinearGradient (bas+w*j,0,bas+w*j+w,0);
-	  //grad.addColorStop (0, "black");
-	  //grad.addColorStop (.2, "gray");
-	  //grad.addColorStop (.5, "white");
-	  //grad.addColorStop (.8, "gray");
-	  //grad.addColorStop (1, "black");
-	  //ct.fillStyle = grad;
-	  //ct.fillRect (bas + w *j, 7*X, w, 2*X);
-	//}
-      //}
-      //ct.strokeStyle = "#ffffff";
       Linea (ct, Mx(0), My(-2), Mx(0), My(2));
       Linea (ct, Mx(-6),My(0), Mx(6), My(0));
 
       /* -- TRIANGOLO -- */
       let perc = new Path2D();
-      perc.moveTo (Mx(0) + X/5, My(2));
-      perc.lineTo (Mx(0) - X/5, My(2));
-      perc.lineTo (Mx(0) - X/5, My(3));
+      perc.moveTo (Mx(0) + 3/16*X, My(2));
+      perc.lineTo (Mx(0) - 3/16*X, My(2));
+      perc.lineTo (Mx(0) - 3/16*X, My(3));
       perc.closePath ();
       ct.fillStyle = "#000000";
-      ct.fill (perc, 'evenodd');
+      ct.fill (perc);
+
+      /* Grad */
+      
+      var dt = [5,10,15]; /* Quanti cambi in una sezione */
+      ct.fillStyle = "#7f7f7f";
+      ct.fillRect (Mx(-6+1.5), My(+1), 12*X-X*1.5, X);
+      ct.fillStyle = "#b18000";
+      ct.fillRect (Mx(2.5), My(+1), X*2.95, X);
+      for (var i=0;i<dt.length;++i)
+      {
+	for (var j=0;j<dt[i];++j)
+	{
+	    /* TODO: Rivedi bas + qualcosa */
+	    let w = 1.85*X/dt[i];
+	    let bas =  ((i==2?.375:0)+.275*(i+1))*X + Mx (-(9-(4.5+1.85*i)));
+	    let grad = ct.createLinearGradient (bas+w*j,0,bas+w*j+w,0);
+	    grad.addColorStop (0, "gray");
+	    grad.addColorStop (.4, "white");
+	    grad.addColorStop (.8, "black");
+	    ct.fillStyle = grad;
+	    ct.fillRect (bas + w*j,8*X,w,X);
+	}
+      }
+      
       /* Raggio di 3Sqr(5) calcolato grazie al teorema di pitagora.
        * Raggio = Pitagora(coordinate_centro, (3;6))
        * il cerchio ha origine in 0;0 quindi il cerchio ha raggio:
