@@ -7,18 +7,17 @@
     <canvas id="monoscopio" width="1955" >
     </canvas>
     <script>
-      /* Todo: Normalizza coordinate */
       function rgbToHex(r, g, b)
       {
 	return "#"+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);
       }
-
       var c = document.getElementById ("monoscopio");
       var ct = c.getContext ("2d");
       var circle = false;
-      var laterali = true;
+      var laterali = false;
       var croce = true;
-      var time = false;
+      var gsx = false;
+      var gdx = false;
       const p = ["PM5544","PM5368","PM5644"];
       var pattern = p[0];
       const width = c.width;
@@ -26,6 +25,7 @@
       var CC = 17/* 23 */; /* Quante colonne (dominio monoscopio) */
       const CD = 12; /* DIAMETRO DEL CERCHIO */
       const gridW = 1;
+
       switch (pattern)
       {
 	case "PM5544":
@@ -44,7 +44,7 @@
       c.height = RC/CC * width;
       const height = c.height;
       const X = width/CC;
-      const GRAYS = 6 /*6*/; /* Numero di grigi nella scala di grigi */
+      const GRAYS = 6; /* Numero di grigi nella scala di grigi */
 
       /* Colori YCGRGB */
       const colori=['#BFBF00','#00BFBF','#00BF00','#BF00BF','#BF0000','#0000BF'];
@@ -364,7 +364,7 @@
 
       /* -- GRIGLIA CENTRALE -- */
       ct.strokeStyle = "#ffffff";
-      if (!time)
+      if (!gsx && !gdx)
       {
 	for (var i=0;i<12;++i)
 	{
@@ -376,10 +376,21 @@
       }
       else
       {
-	Linea (ct, Mx(-5.5), My(-.5), Mx(-5.5), My(+.5));
-	Linea (ct, Mx(+5.5), My(-.5), Mx(+5.5), My(+.5));
-	Linea (ct, Mx(+0.5), My(-.5), Mx(+0.5), My(+.5));
-	Linea (ct, Mx(-0.5), My(-.5), Mx(-0.5), My(+.5));
+	if (gsx)
+	{
+	  Linea (ct, Mx(+0.5), My(-.5), Mx(+0.5), My(+.5));
+	  Linea (ct, Mx(-0.5), My(-.5), Mx(-0.5), My(+.5));
+	  Linea (ct, Mx(-1.5), My(-.5), Mx(-1.5), My(+.5));
+	  Linea (ct, Mx(-1.5), My(-.5), Mx(-1.5), My(+.5));
+	}
+	if (gdx)
+	{
+	  Linea (ct, Mx(+1.5), My(-.5), Mx(+1.5), My(+.5));
+	  Linea (ct, Mx(+1.5), My(-.5), Mx(+1.5), My(+.5));
+	  Linea (ct, Mx(-5.5), My(-.5), Mx(-5.5), My(+.5));
+	  Linea (ct, Mx(+5.5), My(-.5), Mx(+5.5), My(+.5));
+	}
+
       }
       if(circle)
 	ct.restore ();
