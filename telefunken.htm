@@ -4,10 +4,9 @@
     <meta charset='utf-8'>
   </head>
   <body>
-    <canvas id="monoscopio" width="1955" >
+    <canvas id="monoscopio" width="1764" >
     </canvas>
     <script>
-      /* Todo: Normalizza coordinate */
       function rgbToHex(r, g, b)
       {
 	return "#"+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);
@@ -21,24 +20,22 @@
       c.height = RC/CC * width;
       const height = c.height;
       const X = width/CC;
-      const GRAYS = 11;
+      const GRAYS = 5;
 
       /* Colori YCGRGB */
       const colori=['#bfbfbf','#BFBF00','#00BFBF','#00BF00','#BF00BF','#BF0000','#0000BF','#000000'];
-
-      c.width = width;
       c.height = height;
-      ct.lineWidth = 6;
+      ct.lineWidth = 3;
 
       /* Converte il punto in funzione del centro del monoscopio */
       function Mx (offt)
       {
-	return (CC/2 + offt)*X;
+	return (CC/2+offt)*X;
       }
       /* Converte il punto in funzione del centro del monoscopio */
       function My (offt)
       {
-	return (RC/2 + offt)*X;
+	return (RC/2+offt)*X;
       }
       function Linea (ct, x0, y0, x1, y1)
       {
@@ -55,20 +52,17 @@
 	console.log (r);
       }
 
-      /* Cambia sistema di coordinate (dopo merlatura) */
       ct.fillStyle = "#3e3e3e"; /* COLORE GRIGLIA ESTERNA */
       ct.fillRect (0, 0, width, height);
-
-
 
       /* Rettangolo di disegno effettivo */
       ct.fillStyle = "#ffffff";
       ct.fillRect (Mx(-6), My(-5), 12*X, 10*X);
+
       /* -- GRIGLIA ESTERNA -- */
       ct.strokeStyle = "#ffffff";
       for (var i=0;i<RC+1;++i) Linea (ct, 0, X*i, width, X*i);
       for (var j=0;j<CC+1;++j) Linea (ct, X*j, 0, X*j, height);
-
 
       /* -- COLORI PRIMARI -- */
       for (var i=0;i<colori.length;++i)
@@ -84,13 +78,13 @@
 	ct.fillStyle = rgbToHex (c,c,c);
 	ct.fillRect (Mx(-(9-(3+((CD/GRAYS)*i)))),My(-2),X*CD/GRAYS, 2*X);
       }
+
       ct.fillStyle = "#000000";
       ct.fillRect (Mx(-6+2.4), My(0), 2.4*X*3, X)
 
-      Linea (ct, Mx(0), My(-2), Mx(0), My(2));
-      Linea (ct, Mx(-6),My(0), Mx(6), My(0));
 
       /* -- TRIANGOLO -- */
+      /* Base triangolo = .375 */
       let perc = new Path2D();
       perc.moveTo (Mx(0) + 3/16*X, My(2));
       perc.lineTo (Mx(0) - 3/16*X, My(2));
@@ -100,10 +94,11 @@
       ct.fill (perc);
 
       /* Grad */
-      
       var dt = [5,10,15]; /* Quanti cambi in una sezione */
+      var dd = [.275,.525,1.275];
       ct.fillStyle = "#7f7f7f";
       ct.fillRect (Mx(-6+1.5), My(+1), 12*X-X*1.5, X);
+
       ct.fillStyle = "#b18000";
       ct.fillRect (Mx(2.5), My(+1), X*2.95, X);
       for (var i=0;i<dt.length;++i)
@@ -112,7 +107,7 @@
 	{
 	    /* TODO: Rivedi bas + qualcosa */
 	    let w = 1.85*X/dt[i];
-	    let bas =  ((i==2?.375:0)+.275*(i+1))*X + Mx (-(9-(4.5+1.85*i)));
+	    let bas =  dd[i]*X + Mx (-(9-(4.5+1.85*i)));
 	    let grad = ct.createLinearGradient (bas+w*j,0,bas+w*j+w,0);
 	    grad.addColorStop (0, "gray");
 	    grad.addColorStop (.4, "white");
@@ -121,7 +116,6 @@
 	    ct.fillRect (bas + w*j,8*X,w,X);
 	}
       }
-      
       /* Raggio di 3Sqr(5) calcolato grazie al teorema di pitagora.
        * Raggio = Pitagora(coordinate_centro, (3;6))
        * il cerchio ha origine in 0;0 quindi il cerchio ha raggio:
@@ -145,13 +139,16 @@
       ct.fillStyle = grad;
       ct.fillRect (Mx(-6), My(4), 8*X, X);
 
-
+      /* RICALCA */
       ct.moveTo (Mx(-6), My(-5));
       ct.lineTo (Mx(+6), My(-5));
       ct.lineTo (Mx(+6), My(5));
       ct.lineTo (Mx(-6), My(5));
       ct.closePath ();
       ct.stroke ();
+
+      Linea (ct, Mx(0), My(-2), Mx(0), My(2));
+      Linea (ct, Mx(-6),My(0), Mx(6), My(0));
 
     </script>
   </body>
