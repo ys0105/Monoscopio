@@ -1,0 +1,388 @@
+<html>
+  <head>
+    <title> MONOSCOPIO </title>
+    <meta charset='utf-8'>
+  </head>
+  <body>
+    <canvas id="monoscopio" width="1955" >
+    </canvas>
+    <script>
+      /* Todo: Normalizza coordinate */
+      function rgbToHex(r, g, b)
+      {
+	return "#"+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);
+      }
+
+      var c = document.getElementById ("monoscopio");
+      var ct = c.getContext ("2d");
+      var circle = false;
+      var laterali = true;
+      var croce = true;
+      var time = false;
+      const p = ["PM5544","PM5368","PM5644"];
+      var pattern = p[0];
+      const width = c.width;
+      var RC = 13; /* Quante righe (dominio monoscopio) */
+      var CC = 17/* 23 */; /* Quante colonne (dominio monoscopio) */
+      const CD = 12; /* DIAMETRO DEL CERCHIO */
+      const gridW = 1;
+      switch (pattern)
+      {
+	case "PM5544":
+	  circle = true;
+	break;
+	case "PM5644":
+	  CC = 23;
+	  circle = true;
+	break;
+	case "PM5538":
+	  circle = false;
+	break;
+
+      }
+
+      c.height = RC/CC * width;
+      const height = c.height;
+      const X = width/CC;
+      const GRAYS = 6 /*6*/; /* Numero di grigi nella scala di grigi */
+
+      /* Colori YCGRGB */
+      const colori=['#BFBF00','#00BFBF','#00BF00','#BF00BF','#BF0000','#0000BF'];
+
+      c.width = width+X;
+      c.height = height+X;
+      ct.lineWidth = 6;
+
+      /* Converte il punto in funzione del centro del monoscopio */
+      function Mx (offt)
+      {
+	return (CC/2 + offt)*X;
+      }
+      /* Converte il punto in funzione del centro del monoscopio */
+      function My (offt)
+      {
+	return (RC/2 + offt)*X;
+      }
+      function Linea (ct, x0, y0, x1, y1)
+      {
+	ct.beginPath ();
+	ct.moveTo (x0, y0);
+	ct.lineTo (x1, y1);
+	ct.stroke ();
+      }
+      function Cerchio (ct, x, y, r)
+      {
+	ct.beginPath ();
+	ct.arc (x, y, r, 0, 2*Math.PI);
+	ct.fill ();
+      }
+      function GradH (ct, stx, sty, width,height, hi)
+      {
+	let divs = 3;
+	let skip = height/divs;
+	let col = 0;
+	let bas;
+	let exp = 2;
+	let y, h;
+	for (var i=0;i<divs;++i)
+	{
+	  bas = sty+i*skip;
+	  for (var j=0;j<Math.floor(exp**(i+3));++j)
+	  {
+	    h = skip/(exp**(i+3)); /* Altezza di un rettangolo */
+	    y = bas+h*j;
+	    let grad = ct.createLinearGradient (0,y,0,h+y);
+	    grad.addColorStop (.0, "black");
+	    grad.addColorStop (.5, "white");
+	    grad.addColorStop (1., "black");
+	    ct.fillStyle = grad;
+	    ct.fillRect(stx, y, width, h);
+	    ++col;
+	  }
+	}
+	ct.moveTo (stx, sty);
+	ct.lineTo (stx+width, sty);
+	ct.lineTo (stx+width, sty+height);
+	ct.lineTo (stx, sty+height);
+	ct.closePath ();
+	ct.stroke ();
+      }
+      /* -- MERLATURA -- */
+      function Merlatura (ct, righe, colonne)
+      {
+	for (var i=0;i<colonne;++i)
+	{
+	  ct.fillStyle = (i%2?"#ffffff":"#000000");
+	  ct.fillRect (X*(i+.5),0,X, X/2);
+	  ct.fillRect (X*(i+.5),X*13.5,X, X/2);
+	}
+	for (var i=0;i<righe;++i)
+	{
+	  ct.fillStyle = (i%2?"#ffffff":"#000000");
+	  ct.fillRect (0,X*(i+.5),X/2, X);
+	  ct.fillRect (Mx(CC/2+0.5),X*(i+.5),X/2, X);
+	}
+	ct.fillStyle = "#ffffff";
+	ct.fillRect (0,0, X/2, X/2);
+	ct.fillRect (Mx(CC/2+0.5),0, X/2, X/2);
+	ct.fillRect (0,My(7), X/2, X/2);
+	ct.fillRect (Mx(CC/2+0.5),My(7), X/2, X/2);
+      }
+      Merlatura (ct, RC, CC);
+      /* TODO: Riguarda (for dim*2) */
+      function quad (ct, stx, sty, dim, barre, sx=1)
+      {
+	let oldt = ct.lineWidth;
+	ct.save ();
+	ct.strokeStyle = "#000000";
+	ct.lineWidth = 1;
+	ct.beginPath();
+	ct.rect (stx, sty, dim, dim);
+	ct.clip();
+	var thickness = dim/barre;
+	ct.lineWidth =thickness;
+	for (var i=0;i < dim*2;i++)
+	{
+	  ct.beginPath ();
+	  ct.strokeStyle = (i%2)?"#ffffff":"#000000";
+	  if (sx)
+	  {
+	    ct.moveTo(stx+i*thickness+thickness/2-dim,sty);
+	    ct.lineTo(stx+i*thickness+thickness,dim+sty);
+	  }
+	  else
+	  {
+	    ct.moveTo(stx+i*thickness+thickness/2,sty);
+	    ct.lineTo(stx+i*thickness+thickness-dim,dim+sty);
+	  }
+	  ct.stroke();
+	}
+	ct.restore ();
+	ct.strokeStyle = "#ffffff";
+	ct.beginPath ();
+	ct.moveTo (stx, sty);
+	ct.lineTo (stx+dim, sty);
+	ct.lineTo (stx+dim, sty+dim);
+	ct.lineTo (stx, sty+dim);
+	ct.closePath ();
+	ct.stroke ();
+	ct.lineWidth = oldt;
+      }
+
+
+      /* Cambia sistema di coordinate (dopo merlatura) */
+      ct.translate (X/2, X/2);
+      ct.fillStyle = "#808080"; /* COLORE GRIGLIA ESTERNA */
+      ct.fillRect (0, 0, width, height);
+
+      /* -- GRIGLIA ESTERNA -- */
+      ct.strokeStyle = "#ffffff";
+      for (var i=0;i<RC+1;++i) Linea (ct, 0, X*i, width, X*i);
+      for (var j=0;j<CC+1;++j) Linea (ct, X*j, 0, X*j, height);
+
+      /* -- BARRE LATERALI -- */
+      if (laterali)
+      {
+	ct.fillStyle = "#507ae9";
+	ct.fillRect (Mx(-6.5),My(-5.5),X, 2*X);
+	ct.fillStyle = "#507ae9";
+	ct.fillRect (Mx(5.5),My(-5.5),X, 2*X);
+
+	ct.fillStyle = "#a47a0c";
+	ct.fillRect (Mx(-6.5),My(3.5),X,2*X);
+	ct.fillStyle = "#a47a0c";
+	ct.fillRect (Mx(5.5),My(3.5),X,2*X);
+
+	ct.fillStyle = "#369D7A";
+	ct.fillRect (Mx(-7.5),My(-5.5),X,X*5.5);
+	ct.fillStyle = "#7a9201";
+	ct.fillRect (Mx(6.5),X,X, X*5.5);
+
+	ct.fillStyle = "#be587a";
+	ct.fillRect (Mx(-7.5),My(0),X, 5.5*X);
+	ct.fillStyle = "#7a63f3";
+	ct.fillRect (Mx(6.5),My(0),X, 5.5*X);
+
+	/* TODO: SIMMETRICO, RIDUCI CODICE */
+	ct.strokeStyle = "#ffffff";
+	ct.beginPath ();
+	ct.moveTo (Mx(-7.5,0), My(-5.5,0));
+	ct.lineTo (Mx(-5.5,0), My(-5.5,0));
+	ct.lineTo (Mx(-5.5,0), My(-3.5,0));
+	ct.lineTo (Mx(-6.5,0), My(-3.5,0));
+	ct.lineTo (Mx(-6.5,0), My(3.5,0));
+	ct.lineTo (Mx(-5.5,0), My(3.5,0));
+	ct.lineTo (Mx(-5.5,0), My(5.5,0));
+	ct.lineTo (Mx(-7.5,0), My(5.5,0));
+	ct.lineTo (Mx(-7.5,0), My(-5.5,0));
+	ct.stroke ();
+
+	ct.beginPath ();
+	ct.moveTo (Mx(7.5, 0), My(-5.5,0));
+	ct.lineTo (Mx(5.5, 0), My(-5.5,0));
+	ct.lineTo (Mx(5.5, 0), My(-3.5,0));
+	ct.lineTo (Mx(6.5, 0), My(-3.5,0));
+	ct.lineTo (Mx(6.5, 0), My(3.5,0));
+	ct.lineTo (Mx(5.5, 0), My(3.5,0));
+	ct.lineTo (Mx(5.5, 0), My(5.5,0));
+	ct.lineTo (Mx(7.5, 0), My(5.5,0));
+	ct.lineTo (Mx(7.5, 0), My(-5.5,0));
+	ct.stroke ();
+      }
+
+
+      /* CERCHIO! (Inizia la parte divertente) */
+      if (CC >= 23)
+      {
+	ct.fillStyle = "#000000";
+	Cerchio (ct, Mx(-9.5), My(-4.5), 1.5*X);
+	Cerchio (ct, Mx(9.5), My(-4.5), 1.5*X);
+	Cerchio (ct, Mx(9.5), My(4.5), 1.5*X);
+	Cerchio (ct, Mx(-9.5), My(4.5), 1.5*X);
+
+	quad (ct, Mx (-9.5), My (-2.5), X*2, 30);
+	quad (ct, Mx (-9.5), My (0.5), X*2, 20,0);
+	quad (ct, Mx (7.5), My (-2.5), X*2, 30,0);
+	quad (ct, Mx (7.5), My (0.5), X*2, 20);
+	GradH (ct, Mx(-10.5), My(-2.5), X, 5*X);
+	GradH (ct, Mx(+9.5), My(-2.5), X, 5*X);
+
+	ct.lineWidth = 3;
+	ct.strokeStyle = "#ffffff";
+	/* Todo: 1/4 e` una costante */
+	Linea (ct, Mx(-0.5+1/4),My(-6.2),Mx(0.5-1/4), My(-6.2));
+	Linea (ct, Mx(-0.5+1/4),My(-6.35),Mx(0.5-1/4), My(-6.35));
+	Linea (ct, Mx(-0.5+1/4),My(6.2),Mx(0.5-1/4), My(6.2));
+	Linea (ct, Mx(-0.5+1/4),My(6.35),Mx(0.5-1/4), My(6.35));
+
+	ct.lineWidth = 6;
+	ct.strokeStyle = "#ffffff";
+	Linea (ct, Mx(10.75),My(-.5+1/8),Mx(10.75),My(+.5-1/8));
+	Linea (ct, Mx(11),My(-.5+1/8),Mx(11),My(+.5-1/8));
+	Linea (ct, Mx(11.25),My(-.5+1/8),Mx(11.25),My(+.5-1/8));
+	Linea (ct, Mx(-10.75),My(-.5+1/8),Mx(-10.75),My(+.5-1/8));
+	Linea (ct, Mx(-11),My(-.5+1/8),Mx(-11),My(+.5-1/8));
+	Linea (ct, Mx(-11.25),My(-.5+1/8),Mx(-11.25),My(+.5-1/8));
+	ct.lineWidth = 3;
+      }
+      if (circle)
+      {
+	ct.save ();
+	ct.beginPath ();
+	ct.fillStyle = "#ffffff";
+	Cerchio (ct, Mx(0), My(0), X*6);
+	ct.moveTo (Mx(0), My(0));
+	ct.arc (Mx(0), My(0), X*6, 0, 2 * Math.PI);
+	ct.clip ();
+      }
+      ct.fillStyle = "#ffffff";
+      ct.fillRect (Mx(-6), My(-5.5), CD*X, 11.5*X);
+
+      /*-- BARRA NERA IN ALTO --*/
+      ct.fillStyle = "#000000";
+      ct.fillRect (Mx(-2),My(-5.5),4*X,X);
+      ct.fillRect (Mx(-3),My(+3.5),6*X,X);
+
+      /* -- ONDA QUADRA -- */
+      var quadl = X*CD/18;
+      var bas = Mx (-6);
+      for (var i=0;i<18;++i)
+      {
+	ct.fillStyle=(i%2?"#000000":"#aaaaaa");
+	ct.fillRect (bas, My(-3.5), quadl, X);
+	bas += quadl;
+      }
+
+      /* -- COLORI PRIMARI -- */
+      for (var i=0;i<colori.length;++i)
+      {
+	ct.fillStyle = colori[i];
+	ct.fillRect (Mx (-(8.5-(2.5+2*i))),My(-2.5),X*2, X*2);
+      }
+
+
+      /* -- TIMING Y/C -- */
+      ct.fillStyle = "#bfbf00";
+      ct.fillRect (Mx(-6), My(4.5), X*6.5, X*1.5);
+      ct.fillRect (Mx(.5), My(4.5), X*5.5, X*1.5);
+      ct.fillStyle = "#bf0000";
+      ct.fillRect (Mx(-0.5), My(4.5), X, X*1.5);
+
+      ct.fillStyle = "#000000";
+      ct.fillRect (Mx(-5), My(-4.5), X*2, X);
+      ct.fillRect (Mx(3), My(-4.5), X*2, X);
+
+      /* -- LINEE SINUSOIDALI -- */
+      ct.fillStyle = "#000000";
+      ct.fillRect (Mx(-6), My(0.5), X, X*2);
+      ct.fillRect (Mx(+5), My(0.5), X, X*2);
+      var dt = [5,10,15,25,30]; /* Quanti cambi in una sezione */
+      for (var i=0;i<5;++i)
+      {
+	for (var j=0;j<dt[i];++j)
+	{
+	  let w = 2*X/dt[i];
+	  let bas = Mx (-(8.5-(3.5+2*i)));
+	  let grad = ct.createLinearGradient (bas+w*j,0,bas+w*j+w,0);
+	  grad.addColorStop (0, "black");
+	  grad.addColorStop (.2, "gray");
+	  grad.addColorStop (.5, "white");
+	  grad.addColorStop (.8, "gray");
+	  grad.addColorStop (1, "black");
+	  ct.fillStyle = grad;
+	  ct.fillRect (bas + w *j, 7*X, w, 2*X);
+	}
+      }
+
+
+      /* -- SCALA DI GRIGI -- */
+      for (var i=0;i<GRAYS;++i)
+      {
+	let c = Math.floor ((0xff*i*(100/(GRAYS-1)))/100);
+	ct.fillStyle = rgbToHex (c,c,c);
+	ct.fillRect (Mx(-(8.5-(2.5+((CD/GRAYS)*i)))),My(2.5),X*CD/GRAYS, X);
+      }
+
+      ct.lineWidth = gridW;
+      /* -- CENTRALE -- */
+      ct.fillStyle = "#000000";
+      ct.fillRect (Mx(-6), My(-0.5), CD*X, X);
+      if (croce)
+      {
+	ct.fillRect (Mx(-0.5), My(-1.5), X, 3*X);
+	ct.beginPath ();
+	ct.strokeStyle = "#ffffff";
+	Linea (ct,Mx(-6),My(0),Mx(6),My(0));
+	Linea (ct,Mx(0),My(-1.5),Mx(0),My(1.5));
+      }
+
+      /* -- SPILLI -- */
+      ct.strokeStyle = "#ffffff";
+      Linea (ct, Mx(-2.5),My(+3.5),Mx(-2.5),My(+4.5));
+      ct.strokeStyle = "#000000";
+      Linea (ct, Mx(-2.5),My(-3.5),Mx(-2.5),My(-4.5));
+
+      /* -- GRIGLIA CENTRALE -- */
+      ct.strokeStyle = "#ffffff";
+      if (!time)
+      {
+	for (var i=0;i<12;++i)
+	{
+	  ct.beginPath ();
+	  ct.moveTo (Mx (-(8.5-(3+1*i))),My(-.5));
+	  ct.lineTo (Mx (-(8.5-(3+1*i))),My(+.5));
+	  ct.stroke ();
+	}
+      }
+      else
+      {
+	Linea (ct, Mx(-5.5), My(-.5), Mx(-5.5), My(+.5));
+	Linea (ct, Mx(+5.5), My(-.5), Mx(+5.5), My(+.5));
+	Linea (ct, Mx(+0.5), My(-.5), Mx(+0.5), My(+.5));
+	Linea (ct, Mx(-0.5), My(-.5), Mx(-0.5), My(+.5));
+      }
+      if(circle)
+	ct.restore ();
+    </script>
+  </body>
+</html>
