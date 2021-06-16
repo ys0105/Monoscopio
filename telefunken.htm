@@ -6,9 +6,10 @@
   </head>
   <body>
     <canvas id="monoscopio" width="1764" >
-      Il browser non supporta i canvas
+      Il browser non supporta i canvas.
     </canvas>
     <script>
+      /* TODO: Aggiungi molti spessori per i vari tipi di linea */
       function RgbToHtml(r, g, b)
       {
 	return "#"+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);
@@ -40,16 +41,12 @@
       ct.lineWidth = L;
 
       /* Converte il punto in funzione del centro del monoscopio */
-      function Mx (offt)
-      {
-	return (CC/2+offt)*X;
-      }
+      function Tx (offt)
+      { return (CC/2+offt)*X; }
 
       /* Converte il punto in funzione del centro del monoscopio */
-      function My (offt)
-      {
-	return (RC/2+offt)*X;
-      }
+      function Ty (offt)
+      { return (RC/2+offt)*X; }
 
       function Linea (ct, x0, y0, x1, y1)
       {
@@ -72,7 +69,7 @@
 
       /* Rettangolo di disegno effettivo */
       ct.fillStyle = "#FFFFFF";
-      ct.fillRect (Mx(-6), My(-5), CD*X, 10*X);
+      ct.fillRect (Tx(-6), Ty(-5), CD*X, 10*X);
 
       /* -- GRIGLIA ESTERNA -- */
       ct.strokeStyle = "#FFFFFF";
@@ -83,81 +80,81 @@
       for (var i=0;i<colori.length;++i)
       {
 	ct.fillStyle = colori[i];
-	ct.fillRect (Mx (-9+3+1.5*i),My(-5),1.5*X, X*3);
+	ct.fillRect (Tx (-9+3+1.5*i),Ty(-5),1.5*X, X*3);
       }
 
       /* -- SCALA DI GRIGI -- */
       for (var i=0;i<GRAYS;++i)
       {
-	let c = Math.floor ((255*i*(100/(GRAYS-1)))/100);
+			    /*255*100*/
+	let c = Math.floor ( (25500*i/(GRAYS-1))/100 );
 	ct.fillStyle = RgbToHtml (c,c,c);
-	ct.fillRect (Mx(-(9-(3+((CD/GRAYS)*i)))),My(-2),X*CD/GRAYS, 2*X);
+	ct.fillRect (Tx(-(9-(3+((CD/GRAYS)*i)))),Ty(-2),X*CD/GRAYS, 2*X);
       }
 
       ct.fillStyle = "#000000";
-      ct.fillRect (Mx(-6+2.4), My(0), 2.4*X*3, X)
+      ct.fillRect (Tx(-6+2.4), Ty(0), 2.4*X*3, X)
 
       /* -- TRIANGOLO -- */
       let perc = new Path2D();
       ct.fillStyle = "#000000";
-      perc.moveTo (Mx(0) + 3/16*X, My(2)); /* Base triangolo = .375 */
-      perc.lineTo (Mx(0) - 3/16*X, My(2));
-      perc.lineTo (Mx(0) - 3/16*X, My(3));
+      perc.moveTo (Tx(0) + 3/16*X, Ty(2)); /* Base triangolo = .375 2(3/16) */
+      perc.lineTo (Tx(0) - 3/16*X, Ty(2));
+      perc.lineTo (Tx(0) - 3/16*X, Ty(3));
       perc.closePath ();
       ct.fill (perc);
 
-      /* -- LINEE SINUSOIDALE -- */
+      /* -- LINEE SINUSOIDALI -- */
       var dt = [5,10,15]; /* Quanti cambi in una sezione? */
-      var dd = [.275,.525,1.275];
+      var dd = [.275,.525,1.075]; /* Salti da una sezione ad un'altra */
       ct.fillStyle = "#7F7F7F";
-      ct.fillRect (Mx(-6+1.5), My(+1), (12-1.5)*X, X);
+      ct.fillRect (Tx(-6+1.5), Ty(+1), (12-1.5)*X, X);
 
       ct.fillStyle = "#B18000";
-      ct.fillRect (Mx(2.5), My(+1), X*2.95, X);
+      ct.fillRect (Tx(2.5), Ty(+1), X*2.95, X);
       for (var i=0;i<dt.length;++i)
       {
 	for (var j=0;j<dt[i];++j)
 	{
 	  let w = 1.85*X/dt[i];
-	  let bas =  dd[i]*X + Mx (-9+4.5+1.85*i);
-	  let grad = ct.createLinearGradient (bas+w*j,0,bas+w*j+w,0);
-	  grad.addColorStop (0, "gray");
+	  let bas =  dd[i]*X + Tx (-9+4.5+1.85*i);
+	  let grad = ct.createLinearGradient (bas+w*j,0,bas+w*(1+j),0);
+	  grad.addColorStop (0., "gray");
 	  grad.addColorStop (.4, "white");
 	  grad.addColorStop (.8, "black");
 	  ct.fillStyle = grad;
-	  ct.fillRect (bas + w*j,My(1),w,X);
+	  ct.fillRect (bas + w*j, Ty(1),w,X);
 	}
       }
 
-      Cerchio (ct, Mx(0), My(0), 3*X*Math.sqrt(5));
+      Cerchio (ct, Tx(0), Ty(0), 3*X*Math.sqrt(5));
 
       /* -- SFUMATURE -- */
       ct.fillStyle = "#5E5E5E";
-      ct.fillRect (Mx(2), My (3), 4*X, 2*X);
+      ct.fillRect (Tx(2), Ty (3), 4*X, 2*X);
 
-      let grad = ct.createLinearGradient (Mx(-6),0, Mx(2),0);
+      let grad = ct.createLinearGradient (Tx(-6),0, Tx(2),0);
       grad.addColorStop (0., "#FD0D5E");
       grad.addColorStop (.97,"#000000");
       ct.fillStyle = grad;
-      ct.fillRect (Mx(-6), My(3), 8*X, X);
+      ct.fillRect (Tx(-6), Ty(3), 8*X, X);
 
-      grad = ct.createLinearGradient (Mx(-6),0, Mx(2),0);
+      grad = ct.createLinearGradient (Tx(-6),0, Tx(2),0);
       grad.addColorStop (0., "#5F40FE");
       grad.addColorStop (.97,"#000000");
       ct.fillStyle = grad;
-      ct.fillRect (Mx(-6), My(4), 8*X, X);
+      ct.fillRect (Tx(-6), Ty(4), 8*X, X);
 
-      /* RICALCA */
-      ct.moveTo (Mx(-6), My(-5));
-      ct.lineTo (Mx(+6), My(-5));
-      ct.lineTo (Mx(+6), My(+5));
-      ct.lineTo (Mx(-6), My(+5));
+      /* -- RICALCA RETTANGOLO -- */
+      ct.moveTo (Tx(-6), Ty(-5));
+      ct.lineTo (Tx(+6), Ty(-5));
+      ct.lineTo (Tx(+6), Ty(+5));
+      ct.lineTo (Tx(-6), Ty(+5));
       ct.closePath ();
       ct.stroke ();
 
-      Linea (ct, Mx(+0), My(-2), Mx(0), My(2));
-      Linea (ct, Mx(-6), My(+0), Mx(6), My(0));
-
+      Linea (ct, Tx(+0), Ty(-2), Tx(0), Ty(2));
+      Linea (ct, Tx(-6), Ty(+0), Tx(6), Ty(0));
     </script>
   </body>
 </html>
