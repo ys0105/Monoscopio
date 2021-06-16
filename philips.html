@@ -22,8 +22,8 @@
       const p = ["PM5544","PM5368","PM5644"];
       var pattern = p[0];
       const width = c.width;
-      var RC = 13; /* Quante righe (dominio monoscopio) */
-      var CC = 17/* 23 */; /* Quante colonne (dominio monoscopio) */
+      var RC = 21; /* Quante righe (dominio monoscopio) */
+      var CC = 23/* 23 */; /* Quante colonne (dominio monoscopio) */
       const CD = 12; /* DIAMETRO DEL CERCHIO */
       const gridW = 1;
 
@@ -320,7 +320,7 @@
       ct.fillRect (Mx(-6), My(0.5), X, 2*X);
       ct.fillRect (Mx(+5), My(0.5), X, 2*X);
       var dt = [5,10,15,25,30]; /* Quanti cambi in una sezione */
-      for (var i=0;i<5;++i)
+      for (var i=0;i<dt.length;++i)
       {
 	for (var j=0;j<dt[i];++j)
 	{
@@ -333,7 +333,7 @@
 	  grad.addColorStop (.8, "gray");
 	  grad.addColorStop (1, "black");
 	  ct.fillStyle = grad;
-	  ct.fillRect (bas + w *j, 7*X, w, 2*X);
+	  ct.fillRect (bas + w *j, My(0.5), w, 2*X);
 	}
       }
 
